@@ -16,6 +16,7 @@
 import { ref } from "vue";
 import { useAuthStore } from "../store/auth";
 import { useRouter } from "vue-router";
+import api from "../services/api";
 
 const email = ref("");
 const password = ref("");
@@ -23,16 +24,22 @@ const password = ref("");
 const authStore = useAuthStore();
 const router = useRouter();
 
-const handleLogin = () => {
-  // 🔥 Simulación de login (luego será con backend)
-  if (email.value && password.value) {
-    authStore.login({
+const handleLogin = async () => {
+  try {
+    const res = await api.post("/auth/login", {
       email: email.value,
+      password: password.value,
     });
 
+   
+    localStorage.setItem("token", res.data.token);
+
+    authStore.login(res.data.user);
+
     router.push("/dashboard");
-  } else {
-    alert("Completa los campos");
+
+  } catch (error) {
+    alert("Credenciales incorrectas");
   }
 };
 </script>
