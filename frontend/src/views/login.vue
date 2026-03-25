@@ -9,6 +9,10 @@
     <br /><br />
 
     <button @click="handleLogin">Iniciar sesión</button>
+    <p>
+      ¿No tienes cuenta?
+      <router-link to="/register">Regístrate</router-link>
+    </p>
   </div>
 </template>
 
