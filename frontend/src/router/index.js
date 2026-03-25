@@ -30,14 +30,18 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore();
+router.beforeEach((to) => {
+  const token = localStorage.getItem("token");
 
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next("/login");
-  } else {
-    next();
+  if (to.meta.requiresAuth && !token) {
+    return "/login";
   }
+
+  if (to.path === "/login" && token) {
+    return "/dashboard";
+  }
+
+  return true;
 });
 
 export default router;
