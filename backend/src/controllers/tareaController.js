@@ -2,6 +2,7 @@ import {
   crearTarea,
   obtenerTareasPorUsuario,
   eliminarTarea,
+  actualizarTarea,
 } from "../models/tareaModel.js";
 
 
@@ -41,5 +42,19 @@ export const eliminar = async (req, res) => {
     res.json({ message: "Tarea eliminada" });
   } catch (error) {
     res.status(500).json({ message: "Error al eliminar tarea" });
+  }
+};
+
+
+export const actualizar = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { titulo } = req.body;
+
+    const tarea = await actualizarTarea(id, titulo);
+
+    res.json(tarea);
+  } catch (error) {
+    res.status(500).json({ message: "Error al actualizar tarea" });
   }
 };
