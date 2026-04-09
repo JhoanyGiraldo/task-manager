@@ -3,18 +3,30 @@
     <div class="card">
       <h1>Mis Tareas</h1>
 
-      <!-- Crear tarea -->
+      
       <div class="form">
         <input v-model="titulo" placeholder="Nueva tarea..." />
         <button @click="crearTarea">Agregar</button>
       </div>
 
-      <!-- Lista de tareas -->
+      
       <ul>
-        <li v-for="tarea in tareas" :key="tarea.id">
-          {{ tarea.titulo }}
-          <button @click="eliminarTarea(tarea.id)">❌</button>
-        </li>
+       <li v-for="tarea in tareas" :key="tarea.id" class="tarea-item">
+  
+         <div v-if="editandoId === tarea.id" class="edit-mode">
+           <input v-model="nuevoTitulo" />
+           <button @click="guardarCambio(tarea.id)" class="btn-guardar">Guardar</button>
+         </div>
+
+         <div v-else class="view-mode">
+           <span>{{ tarea.titulo }}</span>
+         <div>
+          <button @click="editarTarea(tarea)" class="btn-editar">Editar</button>
+          <button @click="eliminarTarea(tarea.id)" class="btn-eliminar">Eliminar</button>
+        </div>
+  </div>
+
+</li>
       </ul>
 
       <button class="logout" @click="handleLogout">
@@ -40,6 +52,9 @@ const API = "http://localhost:3000/api/tareas";
 
 
 const token = localStorage.getItem("token");
+
+const editandoId = ref(null);
+const nuevoTitulo = ref("");
 
 // Obtener tareas
 const obtenerTareas = async () => {
@@ -80,6 +95,32 @@ const eliminarTarea = async (id) => {
   obtenerTareas();
 };
 
+
+
+//Actualizar tarea
+const editarTarea = (tarea) => {
+  editandoId.value = tarea.id;
+  nuevoTitulo.value = tarea.titulo;
+};
+
+const guardarCambio = async (id) => {
+  await axios.put(
+    `${API}/${id}`,
+    { titulo: nuevoTitulo.value },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  editandoId.value = null;
+  nuevoTitulo.value = "";
+  obtenerTareas();
+};
+
+
+
 // Logout
 const handleLogout = () => {
   authStore.logout();
@@ -95,7 +136,7 @@ onMounted(() => {
 <style scoped>
 .dashboard-container {
   min-height: 100vh;
-  background: #0f172a;
+  background: linear-gradient(135deg, #0f172a, #1e3a8a);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -104,8 +145,9 @@ onMounted(() => {
 .card {
   background: white;
   padding: 30px;
-  border-radius: 12px;
-  width: 400px;
+  border-radius: 15px;
+  width: 420px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
 h1 {
@@ -122,28 +164,70 @@ h1 {
 input {
   flex: 1;
   padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
 button {
-  padding: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
   cursor: pointer;
+  transition: 0.2s;
 }
+
+button:hover {
+  opacity: 0.85;
+}
+
 
 ul {
   list-style: none;
   padding: 0;
 }
 
-li {
+
+.tarea-item {
+  background: #f1f5f9;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+
+.view-mode {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  align-items: center;
+}
+
+
+.edit-mode {
+  display: flex;
+  gap: 10px;
+}
+
+
+.btn-editar {
+  background: #3b82f6;
+  color: white;
+  margin-right: 5px;
+}
+
+.btn-eliminar {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-guardar {
+  background: #22c55e;
+  color: white;
 }
 
 .logout {
   margin-top: 20px;
   width: 100%;
-  background: red;
+  background: #dc2626;
   color: white;
 }
 </style>
