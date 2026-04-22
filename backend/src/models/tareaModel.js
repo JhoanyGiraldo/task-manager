@@ -1,10 +1,10 @@
 import pool from "../config/db.js";
 
 
-export const crearTarea = async (titulo, user_id) => {
+export const crearTarea = async (titulo, user_id, descripcion, fecha, lugar, categoria, materia, prioridad, etiquetas) => {
   const result = await pool.query(
-    "INSERT INTO tareas (titulo, user_id) VALUES ($1, $2) RETURNING *",
-    [titulo, user_id]
+    "INSERT INTO tareas (titulo, user_id, descripcion, fecha, lugar, categoria, materia, prioridad, etiquetas) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
+    [titulo, user_id, descripcion, fecha, lugar, categoria, materia, prioridad, etiquetas]
   );
   return result.rows[0];
 };

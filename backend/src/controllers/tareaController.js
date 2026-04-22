@@ -8,10 +8,10 @@ import {
 
 export const crear = async (req, res) => {
   try {
-    const { titulo } = req.body;
+    const {  titulo, descripcion, fecha, lugar, categoria, materia, prioridad, etiquetas } = req.body;
     const user_id = req.user.id;
 
-    const tarea = await crearTarea(titulo, user_id);
+    const tarea = await crearTarea(titulo, user_id, descripcion, fecha, lugar, categoria, materia, prioridad, etiquetas);
 
     res.json(tarea);
   } catch (error) {
