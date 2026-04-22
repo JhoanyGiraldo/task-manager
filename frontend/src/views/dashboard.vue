@@ -37,9 +37,16 @@
           <li v-for="tarea in tareas" :key="tarea.id">
             <strong>{{ tarea.titulo }}</strong>
             <p>{{ tarea.descripcion }}</p>
-            <span>{{ tarea.fecha }}</span>
-            <span>{{ tarea.categoria }}</span>
-            <span>{{ tarea.prioridad }}</span>
+            <p>Fecha: {{ formatearFecha(tarea.fecha) }}</p>
+            <p>Lugar: {{ tarea.lugar }}</p>
+            <p>Categoría: {{ tarea.categoria }}</p>
+            <p>Materia: {{ tarea.materia }}</p>
+
+            <p> Prioridad: <span :class="tarea.prioridad || 'media'"> {{ tarea.prioridad }}</span> </p>
+
+
+            <p>Etiquetas: {{ tarea.etiquetas }}</p>
+            
 
             <button @click="eliminarTarea(tarea.id)">Eliminar</button>
           </li>
@@ -61,6 +68,13 @@ import { useRouter } from "vue-router";
 
 const tareas = ref([]);
 const titulo = ref("");
+const descripcion = ref("");
+const fecha = ref("");
+const lugar = ref("");
+const categoria = ref("");
+const materia = ref("");
+const prioridad = ref("media");
+const etiquetas = ref("");
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -89,7 +103,7 @@ const crearTarea = async () => {
 
   await axios.post(
     API,
-    { titulo: titulo.value },
+    { titulo: titulo.value, descripcion: descripcion.value, fecha: fecha.value, lugar: lugar.value, categoria: categoria.value, materia: materia.value, prioridad: prioridad.value, etiquetas: etiquetas.value, },
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -98,6 +112,13 @@ const crearTarea = async () => {
   );
 
   titulo.value = "";
+  descripcion.value = "";
+  fecha.value = "";
+  lugar.value = "";
+  categoria.value = "";
+  materia.value = "";
+  prioridad.value = "media";
+  etiquetas.value = "";
   obtenerTareas();
 };
 
@@ -137,6 +158,10 @@ const guardarCambio = async (id) => {
 };
 
 
+const formatearFecha = (fecha) => {
+  if (!fecha) return "";
+  return new Date(fecha).toLocaleDateString();
+};
 
 // Logout
 const handleLogout = () => {
@@ -276,5 +301,52 @@ button {
   color: white;
   padding: 6px 10px;
   font-size: 12px;
+}
+
+
+
+
+
+.tarea {
+  position: relative;
+  background: #f8fafc;
+  margin-bottom: 15px;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.tarea h3 {
+  margin: 0;
+}
+
+.desc {
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+/* botón eliminar */
+.btn-eliminar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #ef4444;
+  color: white;
+}
+
+/* prioridad */
+.alta {
+  color: red;
+  font-weight: bold;
+}
+
+.media {
+  color: orange;
+  font-weight: bold;
+}
+
+.baja {
+  color: green;
+  font-weight: bold;
 }
 </style>
