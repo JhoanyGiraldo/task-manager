@@ -1,40 +1,57 @@
 <template>
-  <div class="dashboard-container">
-    <div class="card">
-      <h1>Mis Tareas</h1>
+  <div class="dashboard">
+    <header class="header">
+      <h1>Gestor de Tareas</h1>
+      <button @click="handleLogout">Cerrar sesión</button>
+    </header>
 
+    <div class="contenido">
       
-      <div class="form">
-        <input v-model="titulo" placeholder="Nueva tarea..." />
-        <button @click="crearTarea">Agregar</button>
+      <!-- FORMULARIO -->
+      <div class="formulario">
+        <h2>Nueva tarea</h2>
+
+        <input v-model="titulo" placeholder="Título" />
+        <input v-model="descripcion" placeholder="Descripción" />
+        <input type="date" v-model="fecha" />
+        <input v-model="lugar" placeholder="Lugar" />
+        <input v-model="categoria" placeholder="Categoría" />
+        <input v-model="materia" placeholder="Materia" />
+
+        <select v-model="prioridad">
+          <option value="baja">Baja</option>
+          <option value="media">Media</option>
+          <option value="alta">Alta</option>
+        </select>
+
+        <input v-model="etiquetas" placeholder="Etiquetas (coma separadas)" />
+
+        <button @click="crearTarea">Crear tarea</button>
       </div>
 
-      
-      <ul>
-       <li v-for="tarea in tareas" :key="tarea.id" class="tarea-item">
-  
-         <div v-if="editandoId === tarea.id" class="edit-mode">
-           <input v-model="nuevoTitulo" />
-           <button @click="guardarCambio(tarea.id)" class="btn-guardar">Guardar</button>
-         </div>
+      <!-- LISTA -->
+      <div class="lista">
+        <h2>Mis tareas</h2>
 
-         <div v-else class="view-mode">
-           <span>{{ tarea.titulo }}</span>
-         <div>
-          <button @click="editarTarea(tarea)" class="btn-editar">Editar</button>
-          <button @click="eliminarTarea(tarea.id)" class="btn-eliminar">Eliminar</button>
-        </div>
-  </div>
+        <ul>
+          <li v-for="tarea in tareas" :key="tarea.id">
+            <strong>{{ tarea.titulo }}</strong>
+            <p>{{ tarea.descripcion }}</p>
+            <span>{{ tarea.fecha }}</span>
+            <span>{{ tarea.categoria }}</span>
+            <span>{{ tarea.prioridad }}</span>
 
-</li>
-      </ul>
+            <button @click="eliminarTarea(tarea.id)">Eliminar</button>
+          </li>
+        </ul>
+      </div>
 
-      <button class="logout" @click="handleLogout">
-        Cerrar sesión
-      </button>
     </div>
   </div>
 </template>
+
+
+
 
 <script setup>
 import { ref, onMounted } from "vue";
@@ -133,101 +150,131 @@ onMounted(() => {
 });
 </script>
 
+
+
+
+
+
 <style scoped>
-.dashboard-container {
+.dashboard {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh;
   background: linear-gradient(135deg, #0f172a, #1e3a8a);
+  color: white;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  padding: 20px;
+  background: #1e293b;
 }
 
-.card {
-  background: white;
-  padding: 30px;
-  border-radius: 15px;
-  width: 420px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+.header h1 {
+  margin: 0;
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
+.header button {
+  background: red;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
 }
 
-.form {
+/* CONTENIDO */
+.contenido {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 20px;
+  padding: 20px;
+  flex: 1;
 }
 
-input {
-  flex: 1;
+/* FORMULARIO */
+.formulario {
+  width: 30%;
+  background: white;
+  color: black;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+/* LISTA */
+.lista {
+  width: 70%;
+  background: white;
+  color: black;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+/* INPUTS */
+input, select {
+  width: 100%;
+  margin-bottom: 10px;
   padding: 10px;
-  border-radius: 8px;
+  box-sizing: border-box;
+  border-radius: 5px;
   border: 1px solid #ccc;
 }
 
+/* BOTONES */
 button {
   padding: 10px 14px;
-  border-radius: 8px;
-  border: none;
   cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
   transition: 0.2s;
 }
 
-button:hover {
-  opacity: 0.85;
+/* botón crear */
+.formulario button {
+  background: #3b82f6;
+  color: white;
 }
 
+.formulario button:hover {
+  background: #2563eb;
+}
 
-ul {
+/* botón eliminar */
+.lista button {
+  background: #ef4444;
+  color: white;
+  margin-top: 5px;
+}
+
+.lista button:hover {
+  background: #dc2626;
+}
+
+/* ITEMS */
+.lista ul {
   list-style: none;
   padding: 0;
 }
 
-
-.tarea-item {
-  background: #f1f5f9;
-  padding: 10px;
+.lista li {
+  position: relative; 
+  background: #f8fafc;
+  margin-bottom: 12px;
+  padding: 15px;
   border-radius: 10px;
-  margin-bottom: 10px;
+  border: 1px solid #e2e8f0;
 }
 
-
-.view-mode {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-
-.edit-mode {
-  display: flex;
-  gap: 10px;
-}
-
-
-.btn-editar {
-  background: #3b82f6;
-  color: white;
-  margin-right: 5px;
-}
-
-.btn-eliminar {
+.lista li button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
   background: #ef4444;
   color: white;
-}
-
-.btn-guardar {
-  background: #22c55e;
-  color: white;
-}
-
-.logout {
-  margin-top: 20px;
-  width: 100%;
-  background: #dc2626;
-  color: white;
+  padding: 6px 10px;
+  font-size: 12px;
 }
 </style>
