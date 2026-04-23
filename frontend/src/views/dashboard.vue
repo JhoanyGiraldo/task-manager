@@ -7,7 +7,7 @@
 
     <div class="contenido">
       
-      <!-- FORMULARIO -->
+    
       <div class="formulario">
         <h2>Nueva tarea</h2>
 
@@ -29,7 +29,7 @@
         <button @click="crearTarea">Crear tarea</button>
       </div>
 
-      <!-- LISTA -->
+      
       <div class="lista">
         <h2>Mis tareas</h2>
 
@@ -75,6 +75,8 @@ const categoria = ref("");
 const materia = ref("");
 const prioridad = ref("media");
 const etiquetas = ref("");
+
+
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -158,6 +160,9 @@ const guardarCambio = async (id) => {
 };
 
 
+
+
+
 const formatearFecha = (fecha) => {
   if (!fecha) return "";
   return new Date(fecha).toLocaleDateString();
@@ -190,7 +195,7 @@ onMounted(() => {
   flex-direction: column;
 }
 
-/* HEADER */
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -211,7 +216,7 @@ onMounted(() => {
   border-radius: 6px;
 }
 
-/* CONTENIDO */
+
 .contenido {
   display: flex;
   gap: 20px;
@@ -219,7 +224,7 @@ onMounted(() => {
   flex: 1;
 }
 
-/* FORMULARIO */
+
 .formulario {
   width: 30%;
   background: white;
@@ -228,7 +233,7 @@ onMounted(() => {
   border-radius: 10px;
 }
 
-/* LISTA */
+
 .lista {
   width: 70%;
   background: white;
@@ -237,7 +242,7 @@ onMounted(() => {
   border-radius: 10px;
 }
 
-/* INPUTS */
+
 input, select {
   width: 100%;
   margin-bottom: 10px;
@@ -247,7 +252,7 @@ input, select {
   border: 1px solid #ccc;
 }
 
-/* BOTONES */
+
 button {
   padding: 10px 14px;
   cursor: pointer;
@@ -257,7 +262,7 @@ button {
   transition: 0.2s;
 }
 
-/* botón crear */
+
 .formulario button {
   background: #3b82f6;
   color: white;
@@ -278,7 +283,7 @@ button {
   background: #dc2626;
 }
 
-/* ITEMS */
+
 .lista ul {
   list-style: none;
   padding: 0;
@@ -325,7 +330,7 @@ button {
   margin-bottom: 8px;
 }
 
-/* botón eliminar */
+
 .btn-eliminar {
   position: absolute;
   top: 10px;
@@ -334,7 +339,7 @@ button {
   color: white;
 }
 
-/* prioridad */
+
 .alta {
   color: red;
   font-weight: bold;
