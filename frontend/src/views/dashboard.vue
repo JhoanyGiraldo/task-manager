@@ -18,7 +18,7 @@
         <input v-model="categoria" placeholder="Categoría" />
         <input v-model="materia" placeholder="Materia" />
 
-        <select v-model="prioridad">
+        <select v-model="prioridad" :disabled="prioridadVista !== 'todas'">
           <option value="baja">Baja</option>
           <option value="media">Media</option>
           <option value="alta">Alta</option>
@@ -34,7 +34,7 @@
         <h2>Mis tareas</h2>
 
         <ul>
-          <li v-for="tarea in tareas" :key="tarea.id">
+          <li v-for="tarea in tareasFiltradas" :key="tarea.id">
             <strong>{{ tarea.titulo }}</strong>
             <p>{{ tarea.descripcion }}</p>
             <p>Fecha: {{ formatearFecha(tarea.fecha) }}</p>
@@ -61,10 +61,10 @@
 
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed,  watch} from "vue";
 import axios from "axios";
 import { useAuthStore } from "../store/auth";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 
 const tareas = ref([]);
 const titulo = ref("");
@@ -80,6 +80,7 @@ const etiquetas = ref("");
 
 const authStore = useAuthStore();
 const router = useRouter();
+const route = useRoute();
 
 const API = "http://localhost:3000/api/tareas";
 
@@ -99,13 +100,42 @@ const obtenerTareas = async () => {
   tareas.value = res.data;
 };
 
+
+
 // Crear tarea
 const crearTarea = async () => {
-  if (!titulo.value) return;
+  console.log("click crear tarea");
+  if (
+    !titulo.value ||
+    !descripcion.value ||
+    !fecha.value ||
+    !lugar.value ||
+    !categoria.value ||
+    !materia.value ||
+    !etiquetas.value
+  ) {
+    alert("Todos los campos son obligatorios");
+    return;
+  }
+
+  
+  const prioridadFinal =
+    prioridadVista.value === "todas"
+      ? prioridad.value
+      : prioridadVista.value;
 
   await axios.post(
     API,
-    { titulo: titulo.value, descripcion: descripcion.value, fecha: fecha.value, lugar: lugar.value, categoria: categoria.value, materia: materia.value, prioridad: prioridad.value, etiquetas: etiquetas.value, },
+    {
+      titulo: titulo.value,
+      descripcion: descripcion.value,
+      fecha: fecha.value,
+      lugar: lugar.value,
+      categoria: categoria.value,
+      materia: materia.value,
+      prioridad: prioridadFinal,
+      etiquetas: etiquetas.value,
+    },
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -113,16 +143,27 @@ const crearTarea = async () => {
     }
   );
 
+  
   titulo.value = "";
   descripcion.value = "";
   fecha.value = "";
   lugar.value = "";
   categoria.value = "";
   materia.value = "";
-  prioridad.value = "media";
   etiquetas.value = "";
+
+  
+  if (prioridadVista.value === "todas") {
+    prioridad.value = "media";
+  } else {
+    prioridad.value = prioridadVista.value;
+  }
+
   obtenerTareas();
 };
+
+
+
 
 // Eliminar tarea
 const eliminarTarea = async (id) => {
@@ -168,16 +209,41 @@ const formatearFecha = (fecha) => {
   return new Date(fecha).toLocaleDateString();
 };
 
+
+const tareasFiltradas = computed(() => {
+  if (prioridadVista.value === "todas") return tareas.value;
+
+  return tareas.value.filter(
+    (t) => t.prioridad === prioridadVista.value
+  );
+});
+
 // Logout
 const handleLogout = () => {
   authStore.logout();
   router.push("/login");
 };
 
-// Cargar al entrar
+const prioridadVista = computed(() => {
+  return route.path.split("/")[2] || "todas";
+});
+
+watch(
+  prioridadVista,
+  (nuevaVista) => {
+    if (nuevaVista !== "todas") {
+      prioridad.value = nuevaVista;
+    } else {
+      prioridad.value = "media";
+    }
+  },
+  { immediate: true }
+);
+
 onMounted(() => {
   obtenerTareas();
 });
+
 </script>
 
 
