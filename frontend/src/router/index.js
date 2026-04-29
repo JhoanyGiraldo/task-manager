@@ -4,6 +4,7 @@ import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
 import Dashboard from "../views/Dashboard.vue";
 import { useAuthStore } from "../store/auth";
+import MainLayout from "../layouts/MainLayout.vue";
 
 const routes = [
   {
@@ -19,10 +20,28 @@ const routes = [
     component: Register,
   },
   {
-    path: "/dashboard",
-    component: Dashboard,
-    meta: { requiresAuth: true }
-  },
+  path: "/dashboard",
+  component: MainLayout,
+  meta: { requiresAuth: true },
+  children: [
+    {
+      path: "",
+      component: Dashboard,
+    },
+    {
+      path: "alta",
+      component: Dashboard,
+    },
+    {
+      path: "media",
+      component: Dashboard,
+    },
+    {
+      path: "baja",
+      component: Dashboard,
+    },
+  ],
+}
 ];
 
 const router = createRouter({
