@@ -1,8 +1,7 @@
 <template>
   <div class="dashboard">
     <header class="header">
-      <h1>Gestor de Tareas</h1>
-      <button @click="handleLogout">Cerrar sesión</button>
+      
     </header>
 
     <div class="contenido">
@@ -35,20 +34,45 @@
 
         <ul>
           <li v-for="tarea in tareasFiltradas" :key="tarea.id">
-            <strong>{{ tarea.titulo }}</strong>
-            <p>{{ tarea.descripcion }}</p>
-            <p>Fecha: {{ formatearFecha(tarea.fecha) }}</p>
-            <p>Lugar: {{ tarea.lugar }}</p>
-            <p>Categoría: {{ tarea.categoria }}</p>
-            <p>Materia: {{ tarea.materia }}</p>
+             <div v-if="editandoId !== tarea.id">
+    <strong>{{ tarea.titulo }}</strong>
+    <p>{{ tarea.descripcion }}</p>
+    <p>Fecha: {{ formatearFecha(tarea.fecha) }}</p>
+    <p>Lugar: {{ tarea.lugar }}</p>
+    <p>Categoría: {{ tarea.categoria }}</p>
+    <p>Materia: {{ tarea.materia }}</p>
 
-            <p> Prioridad: <span :class="tarea.prioridad || 'media'"> {{ tarea.prioridad }}</span> </p>
+    <p>
+      Prioridad:
+      <span :class="tarea.prioridad || 'media'">
+        {{ tarea.prioridad }}
+      </span>
+    </p>
 
+    <p>Etiquetas: {{ tarea.etiquetas }}</p>
 
-            <p>Etiquetas: {{ tarea.etiquetas }}</p>
-            
+    <div style="margin-top:10px; display:flex; gap:10px;">
+      <button @click="editarTarea(tarea)">Editar</button>
+      <button @click="eliminarTarea(tarea.id)">Eliminar</button>
+    </div>
+  </div>
 
-            <button @click="eliminarTarea(tarea.id)">Eliminar</button>
+  
+  <div v-else>
+    <input v-model="tareaEditando.titulo" />
+    <input v-model="tareaEditando.descripcion" />
+    <input type="date" v-model="tareaEditando.fecha" />
+    <input v-model="tareaEditando.lugar" />
+    <input v-model="tareaEditando.categoria" />
+    <input v-model="tareaEditando.materia" />
+    <input v-model="tareaEditando.prioridad" />
+    <input v-model="tareaEditando.etiquetas" />
+
+    <div style="margin-top:10px; display:flex; gap:10px;">
+      <button @click="guardarCambio(tarea.id)">Guardar</button>
+      <button @click="editandoId = null">Cancelar</button>
+    </div>
+  </div>
           </li>
         </ul>
       </div>
@@ -88,7 +112,7 @@ const API = "http://localhost:3000/api/tareas";
 const token = localStorage.getItem("token");
 
 const editandoId = ref(null);
-const nuevoTitulo = ref("");
+const tareaEditando = ref({});
 
 // Obtener tareas
 const obtenerTareas = async () => {
@@ -181,13 +205,17 @@ const eliminarTarea = async (id) => {
 //Actualizar tarea
 const editarTarea = (tarea) => {
   editandoId.value = tarea.id;
-  nuevoTitulo.value = tarea.titulo;
+
+  tareaEditando.value = {
+    ...tarea,
+    fecha: tarea.fecha ? tarea.fecha.split("T")[0] : "",
+  };
 };
 
 const guardarCambio = async (id) => {
   await axios.put(
     `${API}/${id}`,
-    { titulo: nuevoTitulo.value },
+    tareaEditando.value,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -196,10 +224,9 @@ const guardarCambio = async (id) => {
   );
 
   editandoId.value = null;
-  nuevoTitulo.value = "";
+  tareaEditando.value = {};
   obtenerTareas();
 };
-
 
 
 
@@ -218,11 +245,7 @@ const tareasFiltradas = computed(() => {
   );
 });
 
-// Logout
-const handleLogout = () => {
-  authStore.logout();
-  router.push("/login");
-};
+
 
 const prioridadVista = computed(() => {
   return route.path.split("/")[2] || "todas";
@@ -259,27 +282,6 @@ onMounted(() => {
   color: white;
   display: flex;
   flex-direction: column;
-}
-
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  background: #1e293b;
-}
-
-.header h1 {
-  margin: 0;
-}
-
-.header button {
-  background: red;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 6px;
 }
 
 
@@ -365,7 +367,6 @@ button {
 }
 
 .lista li button {
-  position: absolute;
   top: 10px;
   right: 10px;
   background: #ef4444;

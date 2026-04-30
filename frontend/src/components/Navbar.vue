@@ -1,10 +1,10 @@
 <template>
   <nav class="navbar">
     
-    <div class="logo">
-      Gestor
-    </div>
+   
+    <div class="logo">TASK-MANAGER</div>
 
+  
     <div class="menu">
       <router-link to="/dashboard">Todas</router-link>
       <router-link to="/dashboard/alta">Alta</router-link>
@@ -12,9 +12,14 @@
       <router-link to="/dashboard/baja">Baja</router-link>
     </div>
 
+    
     <div class="acciones">
-      <span class="campana"></span>
-      <button @click="logout">Salir</button>
+      <span class="campana">🔔</span>
+
+      
+      <button class="btn-logout" @click="logout">
+        Cerrar sesión
+      </button>
     </div>
 
   </nav>
@@ -39,17 +44,22 @@ const logout = () => {
   justify-content: space-between;
   align-items: center;
   background: #1e2a38;
-  padding: 15px 30px;
+   height: 70px;             
+  padding: 0 30px;   
   color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  z-index: 10;
 }
 
-/* LOGO */
+
 .logo {
-  font-size: 20px;
-  font-weight: bold;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #ffffff; 
 }
 
-/* MENU */
+
 .menu {
   display: flex;
   gap: 20px;
@@ -63,32 +73,31 @@ const logout = () => {
   transition: 0.3s;
 }
 
-/* HOVER */
 .menu a:hover {
   background: #334155;
   color: white;
 }
 
-/* ACTIVO */
 .menu a.router-link-active {
   background: #2563eb;
   color: white;
   font-weight: bold;
 }
 
-/* ACCIONES */
+
 .acciones {
   display: flex;
   align-items: center;
   gap: 15px;
 }
 
+
 .campana {
-  font-size: 18px;
+  font-size: 20px;
   cursor: pointer;
 }
 
-.acciones button {
+.btn-logout {
   background: #ef4444;
   border: none;
   padding: 8px 14px;
@@ -98,7 +107,7 @@ const logout = () => {
   transition: 0.3s;
 }
 
-.acciones button:hover {
+.btn-logout:hover {
   background: #dc2626;
 }
 </style>
