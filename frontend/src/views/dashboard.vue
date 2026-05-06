@@ -1,81 +1,26 @@
 <template>
   <div class="dashboard">
     <header class="header">
-      
+
     </header>
 
     <div class="contenido">
-      
-    
-      <div class="formulario">
-        <h2>Nueva tarea</h2>
 
-        <input v-model="titulo" placeholder="Título" />
-        <input v-model="descripcion" placeholder="Descripción" />
-        <input type="date" v-model="fecha" />
-        <input v-model="lugar" placeholder="Lugar" />
-        <input v-model="categoria" placeholder="Categoría" />
-        <input v-model="materia" placeholder="Materia" />
+      <!-- 🔥 FORMULARIO -->
+      <TareaForm
+        :prioridadVista="prioridadVista"
+        @crear="crearTarea"
+      />
 
-        <select v-model="prioridad" :disabled="prioridadVista !== 'todas'">
-          <option value="baja">Baja</option>
-          <option value="media">Media</option>
-          <option value="alta">Alta</option>
-        </select>
-
-        <input v-model="etiquetas" placeholder="Etiquetas (coma separadas)" />
-
-        <button @click="crearTarea">Crear tarea</button>
-      </div>
-
-      
-      <div class="lista">
-        <h2>Mis tareas</h2>
-
-        <ul>
-          <li v-for="tarea in tareasFiltradas" :key="tarea.id">
-             <div v-if="editandoId !== tarea.id">
-    <strong>{{ tarea.titulo }}</strong>
-    <p>{{ tarea.descripcion }}</p>
-    <p>Fecha: {{ formatearFecha(tarea.fecha) }}</p>
-    <p>Lugar: {{ tarea.lugar }}</p>
-    <p>Categoría: {{ tarea.categoria }}</p>
-    <p>Materia: {{ tarea.materia }}</p>
-
-    <p>
-      Prioridad:
-      <span :class="tarea.prioridad || 'media'">
-        {{ tarea.prioridad }}
-      </span>
-    </p>
-
-    <p>Etiquetas: {{ tarea.etiquetas }}</p>
-
-    <div style="margin-top:10px; display:flex; gap:10px;">
-      <button @click="editarTarea(tarea)">Editar</button>
-      <button @click="eliminarTarea(tarea.id)">Eliminar</button>
-    </div>
-  </div>
-
-  
-  <div v-else>
-    <input v-model="tareaEditando.titulo" />
-    <input v-model="tareaEditando.descripcion" />
-    <input type="date" v-model="tareaEditando.fecha" />
-    <input v-model="tareaEditando.lugar" />
-    <input v-model="tareaEditando.categoria" />
-    <input v-model="tareaEditando.materia" />
-    <input v-model="tareaEditando.prioridad" />
-    <input v-model="tareaEditando.etiquetas" />
-
-    <div style="margin-top:10px; display:flex; gap:10px;">
-      <button @click="guardarCambio(tarea.id)">Guardar</button>
-      <button @click="editandoId = null">Cancelar</button>
-    </div>
-  </div>
-          </li>
-        </ul>
-      </div>
+      <!-- 🔥 LISTA -->
+      <TareaLista
+        :tareas="tareasFiltradas"
+        :editandoId="editandoId"
+        @editar="editarTarea"
+        @eliminar="eliminarTarea"
+        @guardar="guardarCambio"
+        @cancelar="editandoId = null"
+      />
 
     </div>
   </div>
@@ -85,22 +30,15 @@
 
 
 <script setup>
-import { ref, onMounted, computed,  watch} from "vue";
+import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 import { useAuthStore } from "../store/auth";
 import { useRouter, useRoute } from "vue-router";
 
+import TareaForm from "../components/TareaForm.vue";
+import TareaLista from "../components/TareaLista.vue";
+
 const tareas = ref([]);
-const titulo = ref("");
-const descripcion = ref("");
-const fecha = ref("");
-const lugar = ref("");
-const categoria = ref("");
-const materia = ref("");
-const prioridad = ref("media");
-const etiquetas = ref("");
-
-
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -108,9 +46,9 @@ const route = useRoute();
 
 const API = "http://localhost:3000/api/tareas";
 
-
 const token = localStorage.getItem("token");
 
+// 🔥 EDICIÓN
 const editandoId = ref(null);
 const tareaEditando = ref({});
 
@@ -121,44 +59,41 @@ const obtenerTareas = async () => {
       Authorization: `Bearer ${token}`,
     },
   });
+
   tareas.value = res.data;
 };
 
-
-
-// Crear tarea
-const crearTarea = async () => {
-  console.log("click crear tarea");
+// 🔥 CREAR TAREA (AHORA RECIBE DATOS)
+const crearTarea = async (datos) => {
   if (
-    !titulo.value ||
-    !descripcion.value ||
-    !fecha.value ||
-    !lugar.value ||
-    !categoria.value ||
-    !materia.value ||
-    !etiquetas.value
+    !datos.titulo ||
+    !datos.descripcion ||
+    !datos.fecha ||
+    !datos.lugar ||
+    !datos.categoria ||
+    !datos.materia ||
+    !datos.etiquetas
   ) {
     alert("Todos los campos son obligatorios");
     return;
   }
 
-  
   const prioridadFinal =
     prioridadVista.value === "todas"
-      ? prioridad.value
+      ? datos.prioridad
       : prioridadVista.value;
 
   await axios.post(
     API,
     {
-      titulo: titulo.value,
-      descripcion: descripcion.value,
-      fecha: fecha.value,
-      lugar: lugar.value,
-      categoria: categoria.value,
-      materia: materia.value,
+      titulo: datos.titulo,
+      descripcion: datos.descripcion,
+      fecha: datos.fecha,
+      lugar: datos.lugar,
+      categoria: datos.categoria,
+      materia: datos.materia,
       prioridad: prioridadFinal,
-      etiquetas: etiquetas.value,
+      etiquetas: datos.etiquetas,
     },
     {
       headers: {
@@ -167,27 +102,8 @@ const crearTarea = async () => {
     }
   );
 
-  
-  titulo.value = "";
-  descripcion.value = "";
-  fecha.value = "";
-  lugar.value = "";
-  categoria.value = "";
-  materia.value = "";
-  etiquetas.value = "";
-
-  
-  if (prioridadVista.value === "todas") {
-    prioridad.value = "media";
-  } else {
-    prioridad.value = prioridadVista.value;
-  }
-
   obtenerTareas();
 };
-
-
-
 
 // Eliminar tarea
 const eliminarTarea = async (id) => {
@@ -200,9 +116,7 @@ const eliminarTarea = async (id) => {
   obtenerTareas();
 };
 
-
-
-//Actualizar tarea
+// 🔥 EDITAR
 const editarTarea = (tarea) => {
   editandoId.value = tarea.id;
 
@@ -212,10 +126,11 @@ const editarTarea = (tarea) => {
   };
 };
 
-const guardarCambio = async (id) => {
+// 🔥 GUARDAR CAMBIO
+const guardarCambio = async (id, datosActualizados) => {
   await axios.put(
     `${API}/${id}`,
-    tareaEditando.value,
+    datosActualizados,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -225,48 +140,36 @@ const guardarCambio = async (id) => {
 
   editandoId.value = null;
   tareaEditando.value = {};
+
   obtenerTareas();
 };
 
-
-
-
+// Formatear fecha
 const formatearFecha = (fecha) => {
   if (!fecha) return "";
   return new Date(fecha).toLocaleDateString();
 };
 
-
+// 🔥 FILTRO
 const tareasFiltradas = computed(() => {
-  if (prioridadVista.value === "todas") return tareas.value;
+  if (prioridadVista.value === "todas") {
+    return tareas.value;
+  }
 
   return tareas.value.filter(
     (t) => t.prioridad === prioridadVista.value
   );
 });
 
-
-
+// 🔥 PRIORIDAD SEGÚN RUTA
 const prioridadVista = computed(() => {
   return route.path.split("/")[2] || "todas";
 });
 
-watch(
-  prioridadVista,
-  (nuevaVista) => {
-    if (nuevaVista !== "todas") {
-      prioridad.value = nuevaVista;
-    } else {
-      prioridad.value = "media";
-    }
-  },
-  { immediate: true }
-);
-
+// Cargar al entrar
 onMounted(() => {
   obtenerTareas();
 });
-
 </script>
 
 
@@ -284,141 +187,11 @@ onMounted(() => {
   flex-direction: column;
 }
 
-
 .contenido {
   display: flex;
   gap: 20px;
   padding: 20px;
   flex: 1;
-}
-
-
-.formulario {
-  width: 30%;
-  background: white;
-  color: black;
-  padding: 20px;
-  border-radius: 10px;
-}
-
-
-.lista {
-  width: 70%;
-  background: white;
-  color: black;
-  padding: 20px;
-  border-radius: 10px;
-}
-
-
-input, select {
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 10px;
-  box-sizing: border-box;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-
-button {
-  padding: 10px 14px;
-  cursor: pointer;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  transition: 0.2s;
-}
-
-
-.formulario button {
-  background: #3b82f6;
-  color: white;
-}
-
-.formulario button:hover {
-  background: #2563eb;
-}
-
-/* botón eliminar */
-.lista button {
-  background: #ef4444;
-  color: white;
-  margin-top: 5px;
-}
-
-.lista button:hover {
-  background: #dc2626;
-}
-
-
-.lista ul {
-  list-style: none;
-  padding: 0;
-}
-
-.lista li {
-  position: relative; 
-  background: #f8fafc;
-  margin-bottom: 12px;
-  padding: 15px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-}
-
-.lista li button {
-  top: 10px;
-  right: 10px;
-  background: #ef4444;
-  color: white;
-  padding: 6px 10px;
-  font-size: 12px;
-}
-
-
-
-
-
-.tarea {
-  position: relative;
-  background: #f8fafc;
-  margin-bottom: 15px;
-  padding: 15px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-}
-
-.tarea h3 {
-  margin: 0;
-}
-
-.desc {
-  color: #475569;
-  margin-bottom: 8px;
-}
-
-
-.btn-eliminar {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: #ef4444;
-  color: white;
-}
-
-
-.alta {
-  color: red;
-  font-weight: bold;
-}
-
-.media {
-  color: orange;
-  font-weight: bold;
-}
-
-.baja {
-  color: green;
-  font-weight: bold;
+  align-items: flex-start;
 }
 </style>

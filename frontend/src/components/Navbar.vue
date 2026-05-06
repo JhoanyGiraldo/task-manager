@@ -14,7 +14,7 @@
 
     
     <div class="acciones">
-      <span class="campana">🔔</span>
+      <span class="campana"></span>
 
       
       <button class="btn-logout" @click="logout">
