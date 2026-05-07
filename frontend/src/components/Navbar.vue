@@ -14,7 +14,40 @@
 
     
     <div class="acciones">
-      <span class="campana"></span>
+      <div class="notificaciones-container">
+
+  <span
+    class="campana"
+    @click="mostrarNotificaciones = !mostrarNotificaciones"
+  >
+    🔔 {{ notificacionesStore.cantidad }}
+  </span>
+
+  <div
+    v-if="mostrarNotificaciones"
+    class="dropdown"
+  >
+    <p
+      v-if="notificacionesStore.tareas.length === 0"
+    >
+      No hay tareas próximas
+    </p>
+
+    <div
+      v-for="tarea in notificacionesStore.tareas"
+      :key="tarea.id"
+      class="notificacion"
+    >
+      <strong>{{ tarea.titulo }}</strong>
+
+      <p>
+        {{ new Date(tarea.fecha).toLocaleString() }}
+      </p>
+    </div>
+
+  </div>
+
+</div>
 
       
       <button class="btn-logout" @click="logout">
@@ -26,11 +59,15 @@
 </template>
 
 <script setup>
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../store/auth";
+import { useNotificacionesStore } from "../store/notificaciones";
 
 const router = useRouter();
 const authStore = useAuthStore();
+const notificacionesStore = useNotificacionesStore();
+const mostrarNotificaciones = ref(false);
 
 const logout = () => {
   authStore.logout();
@@ -109,5 +146,53 @@ const logout = () => {
 
 .btn-logout:hover {
   background: #dc2626;
+}
+
+
+
+.notificaciones-container {
+  position: relative;
+}
+
+.campana {
+  cursor: pointer;
+  font-size: 20px;
+  transition: 0.3s;
+}
+
+.campana:hover {
+  transform: scale(1.08);
+}
+
+.dropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  width: 280px;
+  background: white;
+  color: black;
+  border-radius: 14px;
+  padding: 15px;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.2);
+  z-index: 1000;
+}
+
+.notificacion {
+  padding: 10px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.notificacion:last-child {
+  border-bottom: none;
+}
+
+.notificacion strong {
+  color: #1e3a8a;
+}
+
+.notificacion p {
+  margin-top: 5px;
+  font-size: 13px;
+  color: #475569;
 }
 </style>

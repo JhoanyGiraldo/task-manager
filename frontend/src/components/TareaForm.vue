@@ -4,7 +4,7 @@
 
     <input v-model="form.titulo" placeholder="Título" />
     <input v-model="form.descripcion" placeholder="Descripción" />
-    <input type="date" v-model="form.fecha" />
+    <input type="datetime-local" v-model="form.fecha" />
     <input v-model="form.lugar" placeholder="Lugar" />
     <input v-model="form.categoria" placeholder="Categoría" />
     <input v-model="form.materia" placeholder="Materia" />

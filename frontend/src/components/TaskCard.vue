@@ -5,7 +5,10 @@
     <div v-if="editandoId !== tarea.id">
       <strong>{{ tarea.titulo }}</strong>
       <p>{{ tarea.descripcion }}</p>
-      <p>Fecha: {{ formatearFecha(tarea.fecha) }}</p>
+      <p>
+        Fecha:
+        {{ new Date(tarea.fecha).toLocaleString() }}
+      </p>
       <p>Lugar: {{ tarea.lugar }}</p>
       <p>Categoría: {{ tarea.categoria }}</p>
       <p>Materia: {{ tarea.materia }}</p>

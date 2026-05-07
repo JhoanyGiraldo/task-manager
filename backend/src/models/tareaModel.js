@@ -27,10 +27,42 @@ export const eliminarTarea = async (id) => {
 };
 
 
-export const actualizarTarea = async (id, titulo) => {
+
+export const actualizarTarea = async (
+  id,
+  titulo,
+  descripcion,
+  fecha,
+  lugar,
+  categoria,
+  materia,
+  prioridad,
+  etiquetas
+) => {
   const result = await pool.query(
-    "UPDATE tareas SET titulo = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *",
-    [titulo, id]
+    `UPDATE tareas 
+     SET titulo = $1,
+         descripcion = $2,
+         fecha = $3,
+         lugar = $4,
+         categoria = $5,
+         materia = $6,
+         prioridad = $7,
+         etiquetas = $8,
+         updated_at = CURRENT_TIMESTAMP
+     WHERE id = $9
+     RETURNING *`,
+    [
+      titulo,
+      descripcion,
+      fecha,
+      lugar,
+      categoria,
+      materia,
+      prioridad,
+      etiquetas,
+      id,
+    ]
   );
 
   return result.rows[0];

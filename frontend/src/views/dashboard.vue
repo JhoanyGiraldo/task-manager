@@ -1,7 +1,9 @@
 <template>
   <div class="dashboard">
     <header class="header">
-
+     <h2>
+      Tareas próximas: {{ tareasProximas.length }}
+     </h2>
     </header>
 
     <div class="contenido">
@@ -30,19 +32,21 @@
 
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import axios from "axios";
 import { useAuthStore } from "../store/auth";
 import { useRouter, useRoute } from "vue-router";
 
 import TareaForm from "../components/TareaForm.vue";
 import TareaLista from "../components/TareaLista.vue";
+import { useNotificacionesStore } from "../store/notificaciones";
 
 const tareas = ref([]);
 
 const authStore = useAuthStore();
 const router = useRouter();
 const route = useRoute();
+const notificacionesStore = useNotificacionesStore();
 
 const API = "http://localhost:3000/api/tareas";
 
@@ -160,6 +164,33 @@ const tareasFiltradas = computed(() => {
     (t) => t.prioridad === prioridadVista.value
   );
 });
+
+
+const tareasProximas = computed(() => {
+  const ahora = new Date();
+
+  return tareas.value.filter((tarea) => {
+    if (!tarea.fecha) return false;
+
+    const fechaTarea = new Date(tarea.fecha);
+
+    // diferencia en minutos
+    const diferencia =
+      (fechaTarea - ahora) / (1000 * 60);
+
+    return diferencia > 0 && diferencia <= 10;
+  });
+});
+
+watch(
+  tareasProximas,
+  (nuevasTareas) => {
+    notificacionesStore.actualizarNotificaciones(
+      nuevasTareas
+    );
+  },
+  { immediate: true }
+);
 
 // 🔥 PRIORIDAD SEGÚN RUTA
 const prioridadVista = computed(() => {
