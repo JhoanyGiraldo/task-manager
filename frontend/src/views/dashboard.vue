@@ -31,7 +31,7 @@
 
 <script setup>
 import { ref, onMounted, computed, watch } from "vue";
-import axios from "axios";
+import api from "../services/api";
 import { useRoute } from "vue-router";
 
 import TareaForm from "../components/TareaForm.vue";
@@ -43,25 +43,16 @@ const tareas = ref([]);
 const route = useRoute();
 const notificacionesStore = useNotificacionesStore();
 
-const API = "http://localhost:3000/api/tareas";
-
-const token = localStorage.getItem("token");
-
-
 const editandoId = ref(null);
 
 // Obtener tareas
 const obtenerTareas = async () => {
-  const res = await axios.get(API, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const res = await api.get("/tareas");
 
   tareas.value = res.data;
 };
 
-
+// Crear tarea
 const crearTarea = async (datos) => {
   if (
     !datos.titulo ||
@@ -81,54 +72,40 @@ const crearTarea = async (datos) => {
       ? datos.prioridad
       : prioridadVista.value;
 
-  await axios.post(
-    API,
-    {
-      titulo: datos.titulo,
-      descripcion: datos.descripcion,
-      fecha: datos.fecha,
-      lugar: datos.lugar,
-      categoria: datos.categoria,
-      materia: datos.materia,
-      prioridad: prioridadFinal,
-      etiquetas: datos.etiquetas,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  await api.post("/tareas", {
+    titulo: datos.titulo,
+    descripcion: datos.descripcion,
+    fecha: datos.fecha,
+    lugar: datos.lugar,
+    categoria: datos.categoria,
+    materia: datos.materia,
+    prioridad: prioridadFinal,
+    etiquetas: datos.etiquetas,
+  });
 
   obtenerTareas();
 };
 
 // Eliminar tarea
 const eliminarTarea = async (id) => {
-  await axios.delete(`${API}/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  await api.delete(`/tareas/${id}`);
 
   obtenerTareas();
 };
 
-
+// Editar tarea
 const editarTarea = (tarea) => {
   editandoId.value = tarea.id;
 };
 
-
-const guardarCambio = async (id, datosActualizados) => {
-  await axios.put(
-    `${API}/${id}`,
-    datosActualizados,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
+// Guardar cambios
+const guardarCambio = async (
+  id,
+  datosActualizados
+) => {
+  await api.put(
+    `/tareas/${id}`,
+    datosActualizados
   );
 
   editandoId.value = null;
@@ -136,8 +113,7 @@ const guardarCambio = async (id, datosActualizados) => {
   obtenerTareas();
 };
 
-
-
+// Filtrar tareas
 const tareasFiltradas = computed(() => {
   if (prioridadVista.value === "todas") {
     return tareas.value;
@@ -148,7 +124,7 @@ const tareasFiltradas = computed(() => {
   );
 });
 
-
+// Tareas próximas
 const tareasProximas = computed(() => {
   const ahora = new Date();
 
@@ -157,7 +133,6 @@ const tareasProximas = computed(() => {
 
     const fechaTarea = new Date(tarea.fecha);
 
-    // diferencia en minutos
     const diferencia =
       (fechaTarea - ahora) / (1000 * 60);
 
@@ -165,6 +140,7 @@ const tareasProximas = computed(() => {
   });
 });
 
+// Actualizar store de notificaciones
 watch(
   tareasProximas,
   (nuevasTareas) => {
@@ -175,17 +151,16 @@ watch(
   { immediate: true }
 );
 
-
+// Prioridad según ruta
 const prioridadVista = computed(() => {
   return route.path.split("/")[2] || "todas";
 });
 
-// Cargar al entrar
+// Cargar tareas al iniciar
 onMounted(() => {
   obtenerTareas();
 });
 </script>
-
 
 
 

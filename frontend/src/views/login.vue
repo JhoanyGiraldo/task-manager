@@ -8,7 +8,6 @@
 
       <button @click="handleLogin">Ingresar</button>
 
-      <p v-if="error" class="error">{{ error }}</p>
 
       <p class="link">
         ¿No tienes cuenta?
