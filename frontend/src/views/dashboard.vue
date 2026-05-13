@@ -1,20 +1,18 @@
 <template>
   <div class="dashboard">
     <header class="header">
-     <h2>
-      Tareas próximas: {{ tareasProximas.length }}
-     </h2>
+    
     </header>
 
     <div class="contenido">
 
-      <!-- 🔥 FORMULARIO -->
+      
       <TareaForm
         :prioridadVista="prioridadVista"
         @crear="crearTarea"
       />
 
-      <!-- 🔥 LISTA -->
+      
       <TareaLista
         :tareas="tareasFiltradas"
         :editandoId="editandoId"
@@ -34,8 +32,7 @@
 <script setup>
 import { ref, onMounted, computed, watch } from "vue";
 import axios from "axios";
-import { useAuthStore } from "../store/auth";
-import { useRouter, useRoute } from "vue-router";
+import { useRoute } from "vue-router";
 
 import TareaForm from "../components/TareaForm.vue";
 import TareaLista from "../components/TareaLista.vue";
@@ -43,8 +40,6 @@ import { useNotificacionesStore } from "../store/notificaciones";
 
 const tareas = ref([]);
 
-const authStore = useAuthStore();
-const router = useRouter();
 const route = useRoute();
 const notificacionesStore = useNotificacionesStore();
 
@@ -52,9 +47,8 @@ const API = "http://localhost:3000/api/tareas";
 
 const token = localStorage.getItem("token");
 
-// 🔥 EDICIÓN
+
 const editandoId = ref(null);
-const tareaEditando = ref({});
 
 // Obtener tareas
 const obtenerTareas = async () => {
@@ -67,7 +61,7 @@ const obtenerTareas = async () => {
   tareas.value = res.data;
 };
 
-// 🔥 CREAR TAREA (AHORA RECIBE DATOS)
+
 const crearTarea = async (datos) => {
   if (
     !datos.titulo ||
@@ -120,17 +114,12 @@ const eliminarTarea = async (id) => {
   obtenerTareas();
 };
 
-// 🔥 EDITAR
+
 const editarTarea = (tarea) => {
   editandoId.value = tarea.id;
-
-  tareaEditando.value = {
-    ...tarea,
-    fecha: tarea.fecha ? tarea.fecha.split("T")[0] : "",
-  };
 };
 
-// 🔥 GUARDAR CAMBIO
+
 const guardarCambio = async (id, datosActualizados) => {
   await axios.put(
     `${API}/${id}`,
@@ -143,18 +132,12 @@ const guardarCambio = async (id, datosActualizados) => {
   );
 
   editandoId.value = null;
-  tareaEditando.value = {};
 
   obtenerTareas();
 };
 
-// Formatear fecha
-const formatearFecha = (fecha) => {
-  if (!fecha) return "";
-  return new Date(fecha).toLocaleDateString();
-};
 
-// 🔥 FILTRO
+
 const tareasFiltradas = computed(() => {
   if (prioridadVista.value === "todas") {
     return tareas.value;
@@ -192,7 +175,7 @@ watch(
   { immediate: true }
 );
 
-// 🔥 PRIORIDAD SEGÚN RUTA
+
 const prioridadVista = computed(() => {
   return route.path.split("/")[2] || "todas";
 });

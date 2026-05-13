@@ -1,7 +1,7 @@
 <template>
   <li>
 
-    <!-- 🟢 NORMAL -->
+    
     <div v-if="editandoId !== tarea.id">
       <strong>{{ tarea.titulo }}</strong>
       <p>{{ tarea.descripcion }}</p>
@@ -28,7 +28,7 @@
       </div>
     </div>
 
-    <!-- 🟡 EDITANDO -->
+    
     <div v-else>
       <input v-model="tareaLocal.titulo" />
       <input v-model="tareaLocal.descripcion" />
