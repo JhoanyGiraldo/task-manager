@@ -32,11 +32,15 @@
     <div v-else>
       <input v-model="tareaLocal.titulo" />
       <input v-model="tareaLocal.descripcion" />
-      <input type="date" v-model="tareaLocal.fecha" />
+      <input type="datetime-local" v-model="tareaLocal.fecha" />
       <input v-model="tareaLocal.lugar" />
       <input v-model="tareaLocal.categoria" />
       <input v-model="tareaLocal.materia" />
-      <input v-model="tareaLocal.prioridad" />
+      <select v-model="tareaLocal.prioridad">
+        <option value="baja">Baja</option>
+        <option value="media">Media</option>
+        <option value="alta">Alta</option>
+      </select>
       <input v-model="tareaLocal.etiquetas" />
 
       <div class="botones">
@@ -61,14 +65,19 @@ const tareaLocal = ref({ ...props.tarea });
 watch(
   () => props.tarea,
   (nueva) => {
-    tareaLocal.value = { ...nueva };
-  }
+    tareaLocal.value = {
+      ...nueva,
+
+      fecha: nueva.fecha
+        ? new Date(nueva.fecha)
+            .toISOString()
+            .slice(0, 16)
+        : "",
+    };
+  },
+  { immediate: true }
 );
 
-const formatearFecha = (fecha) => {
-  if (!fecha) return "";
-  return new Date(fecha).toLocaleDateString();
-};
 </script>
 
 
@@ -166,5 +175,14 @@ input:focus {
 .baja {
   color: #16a34a;
   font-weight: bold;
+}
+
+select {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  box-sizing: border-box;
 }
 </style>

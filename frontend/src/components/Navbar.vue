@@ -92,6 +92,7 @@ const logout = () => {
 .logo {
   font-size: 28px;
   font-weight: 700;
+  font-family: 'Segoe UI', sans-serif;
   letter-spacing: 1.5px;
   color: #ffffff; 
 }
@@ -128,11 +129,6 @@ const logout = () => {
   gap: 15px;
 }
 
-
-.campana {
-  font-size: 20px;
-  cursor: pointer;
-}
 
 .btn-logout {
   background: #ef4444;

@@ -49,12 +49,34 @@ export const eliminar = async (req, res) => {
 export const actualizar = async (req, res) => {
   try {
     const { id } = req.params;
-    const { titulo } = req.body;
 
-    const tarea = await actualizarTarea(id, titulo);
+    const {
+      titulo,
+      descripcion,
+      fecha,
+      lugar,
+      categoria,
+      materia,
+      prioridad,
+      etiquetas,
+    } = req.body;
+
+    const tarea = await actualizarTarea(
+      id,
+      titulo,
+      descripcion,
+      fecha,
+      lugar,
+      categoria,
+      materia,
+      prioridad,
+      etiquetas
+    );
 
     res.json(tarea);
   } catch (error) {
-    res.status(500).json({ message: "Error al actualizar tarea" });
+    res.status(500).json({
+      message: "Error al actualizar tarea",
+    });
   }
 };
